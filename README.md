@@ -26,7 +26,7 @@ Symbol ノード運営者向けのハーベスト履歴集計スクリプトで�
 ## Requirements
 
 - Node.js 18 以上
-- Symbol ノード（catapult）
+- Symbol-bootstrap が稼働していること
 - MongoDB が稼働していること
 
 ---
