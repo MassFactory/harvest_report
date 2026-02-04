@@ -1,48 +1,104 @@
 /**
  * harvest_report.cjs
- * Symbol Harvest Report
- * - terminal table output
- * - optional CSV output (UTF-8 BOM)
- * - no config file
+ * Symbol Harvest Report（ノード運営者向け）
+ *
+ * 目的:
+ * - 自ノードでの委任者がハーベストしたブロック情報を集計して一覧表示する
+ * - ターミナルに表形式で出力する
+ * - 必要に応じてCSV(UTF-8 BOM付き)で保存する
+ *
+ * 前提:
+ * - Symbol ノードの REST が localhost:3000 で動いている想定（http/https を自動判定）
+ * - ノードの MongoDB(catapult) の内容は REST 経由で参照する
+ * - configファイルは使わず、上部の定数で設定する
  */
 
 const fs = require('fs');
 const path = require('path');
 
 /* ================= 設定 ================= */
-const MAX_ROWS = 20;              // 表示件数
-const CSV_ENABLED = true;         // CSV出力 ON / OFF
-const CSV_DIR = './reports';      // CSV出力先
+/**
+ * ターミナルに表示する最大行数（最新から MAX_ROWS 件）
+ * ※CSVも同じ件数になります
+ */
+const MAX_ROWS = 20;
+
+/**
+ * true: CSV出力する / false: CSV出力しない
+ * ※ターミナル表示は常に行う
+ */
+const CSV_ENABLED = false;
+
+/**
+ * CSVの出力先ディレクトリ（なければ自動作成）
+ */
+const CSV_DIR = './reports';
+
+/**
+ * REST の接続先候補
+ * まず http://localhost:3000 を試し、ダメなら https://localhost:3000 を試す
+ */
 const DEFAULT_HTTP = 'http://localhost:3000';
 const DEFAULT_HTTPS = 'https://localhost:3000';
 
 /* ================= HTTP ================= */
+/**
+ * REST API にアクセスして JSON を返す共通関数
+ * - base: 'http://localhost:3000' など
+ * - p: '/node/health' など（先頭スラッシュ付き）
+ */
 async function fetchJson(base, p) {
   const r = await fetch(base + p);
   if (!r.ok) throw new Error(`HTTP ${r.status} ${p}`);
   return r.json();
 }
+
+/**
+ * REST の生存確認（/node/health が取れればOK）
+ */
 async function probe(base) {
   await fetchJson(base, '/node/health');
   return base;
 }
+
+/**
+ * http / https を自動判定して、使える baseURL を返す
+ */
 async function resolveBaseUrl() {
   try { return await probe(DEFAULT_HTTP); } catch {}
   return probe(DEFAULT_HTTPS);
 }
 
 /* ================= Utils ================= */
+/** 指定msだけ待つ（REST叩きすぎ防止） */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/**
+ * REST応答に混ざることがある "'(シングルクォート)" や "0x" を除去し、
+ * さらに大文字化して比較しやすくする
+ */
 const norm = s => String(s ?? '').replace(/'/g,'').replace(/^0x/i,'').toUpperCase();
 
+/** 数値文字列にカンマを入れる（例: 1234567 -> 1,234,567） */
 function formatComma(n) {
   return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
+
+/**
+ * 通貨モザイク量(最小単位)を divisibility で丸めて「整数XYM」にする
+ * - BigIntで扱う（桁が大きいので Number は危険）
+ * - 四捨五入して整数として返す
+ */
 function roundXYM(amount, div) {
   const a = BigInt(amount ?? 0);
   const b = 10n ** BigInt(div);
   return ((a + b/2n) / b).toString(); // 四捨五入
 }
+
+/**
+ * 通貨モザイク量(最小単位)を "123.456789" のような小数表記にする
+ * - BigIntで扱う（桁が大きいので Number は危険）
+ */
 function decXYM(amount, div) {
   const a = BigInt(amount ?? 0);
   const b = 10n ** BigInt(div);
@@ -50,14 +106,22 @@ function decXYM(amount, div) {
 }
 
 /* ================= JST ================= */
+/**
+ * Symbolのtimestamp/epochはUTCベースなので、JST表示用に +9時間する
+ * ※ここでは Date の UTC系 getter を使って表示のズレを防いでいる
+ */
 function jstDate(ms) {
   return new Date(ms + 9*3600*1000);
 }
+
+/** JST "YYYY-MM-DD HH:MM:SS" 形式で返す */
 function jstString(ms) {
   const d = jstDate(ms);
   const p=n=>String(n).padStart(2,'0');
   return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
 }
+
+/** ファイル名用 "YYYY-MM-DD_HH-MM" のスタンプ（JST） */
 function jstFileStamp(now = Date.now()) {
   const d = jstDate(now);
   const p=n=>String(n).padStart(2,'0');
@@ -65,6 +129,10 @@ function jstFileStamp(now = Date.now()) {
 }
 
 /* ================= 表幅（全角対応） ================= */
+/**
+ * ターミナルの表を崩さないために、全角(日本語)を幅2として計算する
+ * - 表示上の幅を "だいたい" 合わせる目的
+ */
 function isWide(cp){
   return (
     cp>=0x1100 && (
@@ -79,6 +147,8 @@ function isWide(cp){
     )
   );
 }
+
+/** 文字列の表示幅（半角=1, 全角=2） */
 function dWidth(s){
   let w=0;
   for(const c of String(s)){
@@ -86,6 +156,8 @@ function dWidth(s){
   }
   return w;
 }
+
+/** 右パディングして列幅を揃える（全角考慮） */
 function padR(s,w){
   s = String(s ?? '');
   const dw=dWidth(s);
@@ -93,6 +165,10 @@ function padR(s,w){
 }
 
 /* ================= Base32 ================= */
+/**
+ * Symbol アドレスの表示用（Rawアドレス=16進） -> Base32文字列へ変換
+ * RESTが返す address は raw(16進)形式なので、人間が見やすいBase32へ変換する
+ */
 const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 function b32(buf){
   let bits=0,val=0,out='';
@@ -105,11 +181,18 @@ function b32(buf){
   if(bits>0) out+=B32[(val<<(5-bits))&31];
   return out;
 }
+
+/** rawアドレス(16進) -> Base32アドレス文字列 */
 function rawToAddr(hex){
   return b32(Buffer.from(norm(hex),'hex'));
 }
 
 /* ================= Importance % ================= */
+/**
+ * Importance を "xx.xxxxxx%" にして表示する
+ * - totalChainImportance を分母として、割合(%)を小数6桁で出す
+ * - BigIntで計算して精度を落とさない
+ */
 function impPct(imp,total){
   const i=BigInt(String(imp ?? '0').replace(/'/g,''));
   const t=BigInt(String(total ?? '1').replace(/'/g,''));
@@ -119,6 +202,15 @@ function impPct(imp,total){
 }
 
 /* ================= 報酬 ================= */
+/**
+ * 指定ブロック高における「自ノード宛の通貨モザイク受領量」を receipts から合算する
+ * - /statements/block と /statements/transaction の両方を見る
+ * - recipient/target が自ノードの raw address と一致し、mosaicId が通貨なら加算
+ *
+ * 注意:
+ * - REST実装/ノード設定により receipts のフィールド名が揺れることがあるため、
+ *   recipientAddress / targetAddress どちらも見ている
+ */
 async function reward(base,h,raw,mosaic){
   let sum=0n;
   for(const p of [`/statements/block?height=${h}`,`/statements/transaction?height=${h}`]){
@@ -136,6 +228,10 @@ async function reward(base,h,raw,mosaic){
 }
 
 /* ================= 表（ターミナル） ================= */
+/**
+ * 集計結果をターミナルに表形式で出す
+ * - 列幅は全角対応で計算
+ */
 function printTable(base, rows){
   const cols=[
     ['no','No'],
@@ -170,10 +266,21 @@ function printTable(base, rows){
 }
 
 /* ================= CSV（UTF-8 BOM） ================= */
+/**
+ * CSVに書くためのエスケープ処理
+ * - ダブルクォート/改行/カンマが含まれる場合は "..." で囲む
+ * - " は "" にする（CSV仕様）
+ */
 function csvEscape(v){
   const s=String(v ?? '');
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
 }
+
+/**
+ * 集計結果をCSVとして保存する
+ * - UTF-8 BOM を付ける（Excelで文字化けしにくくするため）
+ * - 改行は CRLF（Windows/Excelでの互換性）
+ */
 function writeCsv(rows){
   if(!CSV_ENABLED) return;
 
@@ -196,51 +303,76 @@ function writeCsv(rows){
 
 /* ================= main ================= */
 (async()=>{
+  // RESTのベースURL（http/https）を自動決定
   const base=await resolveBaseUrl();
 
+  // network/properties から epochAdjustment や 通貨モザイクID 等を取得
   const net=await fetchJson(base,'/network/properties');
+
+  // epochAdjustment は "123456" のような文字列なので数値だけ抜く（秒）
   const epoch=Number(net.network.epochAdjustment.match(/\d+/)[0]);
 
+  // 通貨モザイク（XYMなど）のIDと divisibility を取得
   const mosaicId=norm(net.chain.currencyMosaicId);
   const mosaic=await fetchJson(base,`/mosaics/${mosaicId}`);
   const div=mosaic.mosaic.divisibility;
+
+  // インポータンス割合計算の分母（チェーン全体の重要度）
   const totalImp=net.chain.totalChainImportance;
 
+  // ノードに設定されている「unlocked account」（ハーベスト可能なアカウント）の公開鍵一覧
   const unlocked=(await fetchJson(base,'/node/unlockedaccount')).unlockedAccount;
+
+  // accounts/{publicKey} は何度も呼ぶので簡易キャッシュする
   const accCache=new Map();
   const getAcc=async k=>{
     if(!accCache.has(k)) accCache.set(k,(await fetchJson(base,`/accounts/${k}`)).account);
     return accCache.get(k);
   };
 
+  // unlocked account それぞれについて、署名者がその公開鍵のブロックを取得する
+  // pageSize=50 の最新側を取得し、全部まとめて後で height 降順でソートする
   let blocks=[];
   for(const k of unlocked){
     try{
       const r=await fetchJson(base,`/blocks?signerPublicKey=${k}&order=desc&pageSize=50`);
       r.data?.forEach(v=>blocks.push(v.block));
     }catch{}
+    // 連打を避けるため軽く待つ（運用環境に優しい）
     await sleep(20);
   }
 
+  // height を BigInt で扱って降順ソート（最新ブロックを先頭へ）
   blocks.sort((a,b)=>{
     const ah=BigInt(a.height), bh=BigInt(b.height);
     return ah===bh?0:(ah<bh?1:-1);
   });
 
+  // 同じheightが重複することがあるので seen で排除
+  // MAX_ROWS 件集まったら終了
   const seen=new Set(), rows=[];
   for(const b of blocks){
     if(seen.has(b.height)) continue;
     seen.add(b.height);
     if(rows.length>=MAX_ROWS) break;
 
+    // signerPublicKey は「リンクキー」の可能性があるため、linked key を辿って mainKey を決める
     const rAcc=await getAcc(b.signerPublicKey);
     const mainKey=rAcc.supplementalPublicKeys?.linked?.publicKey ?? b.signerPublicKey;
+
+    // mainKey 側のアカウント情報を取得（残高・importanceなど）
     const acc=await getAcc(mainKey);
 
+    // raw address（16進）を正規化
     const raw=norm(acc.address);
+
+    // 通貨モザイク残高を探す（なければ 0）
     const bal=acc.mosaics.find(m=>norm(m.id)===mosaicId)?.amount ?? 0;
+
+    // 対象ブロック高で自ノード宛に入った報酬(通貨モザイク)を receipts から合算
     const rew=await reward(base,b.height,raw,mosaicId);
 
+    // 表／CSV 用に整形
     rows.push({
       no:String(rows.length+1),
       linkKey:b.signerPublicKey,
@@ -248,12 +380,15 @@ function writeCsv(rows){
       balance:formatComma(roundXYM(bal,div)),
       imp:impPct(acc.importance,totalImp),
       height:String(b.height),
-      time:jstString(Number(b.timestamp)+epoch*1000),
+      time:jstString(Number(b.timestamp)+epoch*1000), // Symbol timestamp(ms) = timestamp + epochAdjustment
       reward:decXYM(rew,div),
     });
   }
 
+  // ターミナル出力
   printTable(base,rows);
+
+  // CSV出力（設定ONのときのみ）
   writeCsv(rows);
 })().catch(e=>{
   console.error('ERROR:',e);
