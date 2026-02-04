@@ -164,6 +164,13 @@ function padR(s,w){
   return dw>=w ? s : s + ' '.repeat(w-dw);
 }
 
+/** 左パディングして右寄せ（全角考慮） ★残高列の右寄せ用に追加 */
+function padL(s,w){
+  s = String(s ?? '');
+  const dw=dWidth(s);
+  return dw>=w ? s : ' '.repeat(w-dw) + s;
+}
+
 /* ================= Base32 ================= */
 /**
  * Symbol アドレスの表示用（Rawアドレス=16進） -> Base32文字列へ変換
@@ -260,7 +267,11 @@ function printTable(base, rows){
   console.log(sep);
 
   for(const r of rows){
-    console.log(cols.map(([k],i)=>padR(r[k],widths[i])).join(' | '));
+    console.log(cols.map(([k],i)=>{
+      // ★残高の「値」だけ右寄せ（見出しは左寄せのまま）
+      if(k === 'balance') return padL(r[k], widths[i]);
+      return padR(r[k], widths[i]);
+    }).join(' | '));
   }
   console.log(sep);
 }
@@ -394,4 +405,4 @@ function writeCsv(rows){
   console.error('ERROR:',e);
   process.exit(1);
 });
-
+ 
