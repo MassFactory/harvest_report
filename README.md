@@ -1,7 +1,9 @@
 # harvest_report
-
 A harvest history aggregation script for Symbol node operators.  
 The script retrieves data from the node’s MongoDB (catapult) database and outputs delegator harvest results to the terminal and CSV format.
+
+---
+
 
 
 Symbol ノード運営者向けのハーベスト履歴集計スクリプトです。  
