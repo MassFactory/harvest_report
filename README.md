@@ -7,7 +7,7 @@ As a result, it can be placed directly in a node operation environment and is ea
 
 ---
 
-# Symbol ノード 運営者用ハーベスト集計スクリプトです。
+# Symbol ノード 運営者用ハーベスト集計スクリプト
 
 ## 概要 (Overview)
 
