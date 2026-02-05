@@ -82,10 +82,10 @@ Symbol REST API を直接参照して収集・集計し、
     node harvest_report.cjs
     ```
 ## 設定方法
-   harvest_report.cjs を、お好きなエディタ nano vim 等で開き
-   表示・出力件数の設定 const MAX_ROWS = 20;
-   CSV 出力の有効／無効 const CSV_ENABLED = false;
-   CSV 出力先ディレクトリ const CSV_DIR = './reports';
-   などを編集してください。
+   harvest_report.cjs を、お好きなエディタ nano vim 等で編集してください。
+   **表示・出力件数の設定**: const MAX_ROWS = 20;
+   **CSV 出力の有効／無効**: const CSV_ENABLED = false;
+   **CSV 出力先ディレクトリ**: const CSV_DIR = './reports';
+
 
 
