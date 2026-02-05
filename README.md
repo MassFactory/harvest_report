@@ -4,49 +4,85 @@ The script retrieves data from the node’s MongoDB (catapult) database and outp
 
 ---
 
+# Symbol ノード 運営者用ハーベスト集計スクリプトです。
 
+## 概要 (Overview)
 
-Symbol ノード運営者向けのハーベスト履歴集計スクリプトです。 
-Symbol-bootstrap および Symbol shoestring に対応しています。 
-ノードが保持している MongoDB（catapult）データを参照し、  
-自ノードに接続されている委任者のハーベスト結果をターミナル表示および CSV として出力します。
+自ノードに委任されているアカウントがハーベストしたブロック情報を、
+Symbol REST API を直接参照して収集・集計し、
+ターミナル上に 表形式でわかりやすく表示します。
+また、必要に応じて UTF-8 BOM 付き CSV として出力することも可能です。
 
----
-
-## Target
-
-- Symbol ノード運営者
-- 自前でノードを構築・運用している環境
-- MongoDB（catapult）へ直接アクセス可能な構成
-
----
-
-## Features
-
-- ハーベスト履歴の集計（ターミナル表示）
-- CSV 出力対応（UTF-8 BOM）
-- 出力件数・出力形式を設定可能
-- ノード内部データのみを使用（外部API不要）
+本ツールは Node.js の標準機能のみで実装されており、
+外部ライブラリや Symbol SDK に依存しません。
+そのため、ノード運用環境にそのまま配置でき、
+長期運用やメンテナンスが容易な構成となっています。
 
 ---
 
-## Requirements
+## 主な特徴
 
+- Symbol REST API を直接使用（Symbol SDK 不要）
+- ハーベスト結果をターミナルに表形式で表示（全角文字対応）
+- 残高・インポータンス・報酬量を BigInt で正確に計算
+- Raw アドレスを Base32 アドレスに変換して表示
+- Excel で扱いやすい UTF-8 BOM / CRLF の CSV 出力に対応（任意）
+- HTTP / HTTPS の REST エンドポイントを自動判定
+- ノード常駐・定期実行を想定した安定動作設計
+
+---
+
+## 動作要件
+
+- OS: Ubuntu 20.04 LTS 以上
 - Node.js 18 以上
-- Symbol-bootstrap が稼働していること
-- MongoDB が稼働していること
+- Symbol ノード REST API が稼働していること（既定: localhost:3000）
 
 ---
 
-## Files
+## インストールと実行
 
-- `harvest_report.cjs`  
-  メインスクリプト
+1.  **ノードのインストールディレクトリに移動**
+    ターミナルを開き、`cd`コマンドであなたの`symbol-bootstrap`もしくは `symbol-shoestring`ノードがインストールされているディレクトリに移動します。
+    
+    ```sh
+    # 例
+    cd /home/user/my-symbol-node
+    ```
 
----
+2.  **リポジトリをクローン**
+    現在のディレクトリ（ノードのルート）に、このスクリプトのリポジトリをダウンロードします。
+    ```sh
+    git clone https://github.com/MassFactory/harvest_report.git
+    ```
+    これにより、`harvest_report`という名前の新しいフォルダが作成されます。
 
-## Usage
+3.  **スクリプトのディレクトリに移動**
+    作成されたフォルダの中に移動します。
+    ```sh
+    cd harvest_report
+    ```
+4.  **nodejsのバージョン確認**
+    Node.js 18 以上が必要です。
+    ```sh
+    node -v
+    ```
+    ※`symbol-shoestring` には、node.jsがインストールされていない可能性があります。
+      その場合は、サーバ環境を壊さず依存関係を含めてアプリを管理できる、snapなどで
+      ご用意ください。使い方は調べてください。下記、インストール例
+    ```sh
+    sudo snap install node --classic
+    node -v
+    ```
+5.  **スクリプトの実行**
+    ```sh
+    node harvest_report.cjs
+    ```
+## 設定方法
+   harvest_report.cjs を、お好きなエディタ nano vim 等で開き
+   表示・出力件数の設定 const MAX_ROWS = 20;
+   CSV 出力の有効／無効 const CSV_ENABLED = false;
+   CSV 出力先ディレクトリ const CSV_DIR = './reports';
+   などを編集してください。
 
-```bash
-node harvest_report.cjs
 
