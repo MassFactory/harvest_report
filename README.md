@@ -11,7 +11,7 @@ As a result, it can be placed directly in a node operation environment and is ea
 
 ## 概要 (Overview)
 
-自ノードに委任されているアカウントがハーベストしたブロック情報を、
+運営ノードに委任されているアカウントがハーベストしたブロック情報を、
 Symbol REST API を直接参照して収集・集計し、
 ターミナル上に 表形式でわかりやすく表示します。
 また、必要に応じて UTF-8 BOM 付き CSV として出力することも可能です。
