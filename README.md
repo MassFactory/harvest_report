@@ -39,7 +39,7 @@ Symbol REST API を直接参照して収集・集計し、
 
 - OS: Ubuntu 20.04 LTS 以上
 - Node.js 18 以上
-- Symbol ノード REST API が稼働していること（既定: localhost:3000）
+- Symbol ノード REST API が稼働していること（既定: localhost:3000,3001）
 
 ---
 
