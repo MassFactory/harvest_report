@@ -83,6 +83,7 @@ Symbol REST API を直接参照して収集・集計し、
     ```
     
 ---
+
 ## 設定方法
    harvest_report.cjs を、お好きなエディタ nano vim 等で編集してください。
    - **表示・出力件数の設定**: const MAX_ROWS = 20;
@@ -90,6 +91,7 @@ Symbol REST API を直接参照して収集・集計し、
    - **CSV 出力先ディレクトリ**: const CSV_DIR = './reports';
 
 ---
+
 ## 表示項目の説明
 
 - **リンクキー**: ブロックを生成したアカウントの公開鍵です。
