@@ -10,7 +10,6 @@
  * 前提:
  * - Symbol ノードの REST が localhost:3000 で動いている想定（http/https を自動判定）
  * - ノードの MongoDB(catapult) の内容は REST 経由で参照する
- * - configファイルは使わず、上部の定数で設定する
  */
 
 const fs = require('fs');
