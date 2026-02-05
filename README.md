@@ -72,7 +72,7 @@ Symbol REST API を直接参照して収集・集計し、
     ```
     ※`symbol-shoestring` には、node.jsがインストールされていない可能性があります。
       その場合は、サーバ環境を壊さず依存関係を含めてアプリを管理できる、snapなどで
-      ご用意ください。使い方は調べてください。下記、インストール例
+      ご用意ください。使い方は、snap を調べてください。下記、インストール例
     ```sh
     sudo snap install node --classic
     node -v
