@@ -32,6 +32,7 @@ Symbol REST API を直接参照して収集・集計し、
 - Excel で扱いやすい UTF-8 BOM / CRLF の CSV 出力に対応（任意）
 - HTTP / HTTPS の REST エンドポイントを自動判定
 - ノード常駐・定期実行を想定した安定動作設計
+- `symbol-bootstrap` `symbol-shoestring` に対応
 
 ---
 
