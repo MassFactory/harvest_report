@@ -1,6 +1,9 @@
 # harvest_report
-A harvest history aggregation script for Symbol node operators.  
-The script retrieves data from the node’s MongoDB (catapult) database and outputs delegator harvest results to the terminal and CSV format.
+The tool collects and aggregates harvested block information of accounts delegated to your own node by directly querying the Symbol REST API, and displays the results in a clear, tabular format in the terminal.
+Optionally, the aggregated data can also be exported as a UTF-8 BOM–encoded CSV file.
+
+This tool is implemented using Node.js standard features only and does not depend on external libraries or the Symbol SDK.
+As a result, it can be placed directly in a node operation environment and is easy to maintain for long-term use.
 
 ---
 
