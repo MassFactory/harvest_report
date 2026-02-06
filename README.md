@@ -49,7 +49,7 @@ Symbol REST API を直接参照して収集・集計し、
 1.  **ノードのインストールディレクトリに移動**
     ターミナルを開き、`cd`コマンドであなたの`symbol-bootstrap`もしくは `symbol-shoestring`ノードがインストールされているディレクトリに移動します。
     
-    ```sh
+    ```bash
     # 例
     cd /home/user/my-symbol-node
     ```
