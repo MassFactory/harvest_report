@@ -35,10 +35,10 @@ const CSV_DIR = './reports';
 
 /**
  * REST の接続先候補
- * まず http://localhost:3000 を試し、ダメなら https://localhost:3000 を試す
+ * まず http://localhost:3000 を試し、ダメなら https://localhost:3001 を試す
  */
 const DEFAULT_HTTP = 'http://localhost:3000';
-const DEFAULT_HTTPS = 'https://localhost:3000';
+const DEFAULT_HTTPS = 'https://localhost:3001';
 
 /* ================= HTTP ================= */
 /**
