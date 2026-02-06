@@ -48,38 +48,37 @@ Symbol REST API を直接参照して収集・集計し、
 
 1.  **ノードのインストールディレクトリに移動**
     ターミナルを開き、`cd`コマンドであなたの`symbol-bootstrap`もしくは `symbol-shoestring`ノードがインストールされているディレクトリに移動します。
-    
+    # 例    
     ```bash
-    # 例
     cd /home/user/my-symbol-node
     ```
 
 2.  **リポジトリをクローン**
     現在のディレクトリ（ノードのルート）に、このスクリプトのリポジトリをダウンロードします。
-    ```sh
+    ```bash
     git clone https://github.com/MassFactory/harvest_report.git
     ```
     これにより、`harvest_report`という名前の新しいフォルダが作成されます。
 
 3.  **スクリプトのディレクトリに移動**
     作成されたフォルダの中に移動します。
-    ```sh
+    ```bash
     cd harvest_report
     ```
 4.  **nodejsのバージョン確認**
     Node.js 18 以上が必要です。
-    ```sh
+    ```bash
     node -v
     ```
     ※`symbol-shoestring` には、node.jsがインストールされていない可能性があります。
       その場合は、サーバ環境を壊さず依存関係を含めてアプリを管理できる、snapなどで
       ご用意ください。使い方は、snap を調べてください。下記、インストール例
-    ```sh
+    ```bash
     sudo snap install node --classic
     node -v
     ```
 5.  **スクリプトの実行**
-    ```sh
+    ```bash
     node harvest_report.cjs
     ```
     
