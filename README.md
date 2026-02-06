@@ -65,7 +65,7 @@ Symbol REST API を直接参照して収集・集計し、
     ```bash
     cd harvest_report
     ```
-4.  **nodejsのバージョン確認**
+4.  **Node.jsのバージョン確認**
     Node.js 18 以上が必要です。
     ```bash
     node -v
@@ -75,6 +75,9 @@ Symbol REST API を直接参照して収集・集計し、
       Node.js 18以上をご用意ください。使い方は、snap を調べてください。下記、インストール例
     ```bash
     sudo snap install node --classic
+    ```
+    再度、Node.jsのバージョン確認
+    ```bash
     node -v
     ```
 5.  **スクリプトの実行**
