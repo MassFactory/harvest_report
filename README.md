@@ -48,7 +48,7 @@ Symbol REST API を直接参照して収集・集計し、
 
 1.  **ノードのインストールディレクトリに移動**
     ターミナルを開き、`cd`コマンドであなたの`symbol-bootstrap`もしくは `symbol-shoestring`ノードがインストールされているディレクトリに移動します。
-    # 例    
+    例    
     ```bash
     cd /home/user/my-symbol-node
     ```
@@ -72,7 +72,7 @@ Symbol REST API を直接参照して収集・集計し、
     ```
     ※`symbol-shoestring` には、node.jsがインストールされていない可能性があります。
       その場合は、サーバ環境を壊さず依存関係を含めてアプリを管理できる、snapなどで
-      ご用意ください。使い方は、snap を調べてください。下記、インストール例
+      Node.js 18以上をご用意ください。使い方は、snap を調べてください。下記、インストール例
     ```bash
     sudo snap install node --classic
     node -v
