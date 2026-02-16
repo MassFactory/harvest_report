@@ -20,7 +20,7 @@ const path = require('path');
  * ターミナルに表示する最大行数（最新から MAX_ROWS 件）
  * ※CSVも同じ件数になります
  */
-const MAX_ROWS = 100;
+const MAX_ROWS = 20;
 
 /**
  * true: CSV出力する / false: CSV出力しない
