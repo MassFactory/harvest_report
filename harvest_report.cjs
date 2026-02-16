@@ -20,7 +20,7 @@ const path = require('path');
  * ターミナルに表示する最大行数（最新から MAX_ROWS 件）
  * ※CSVも同じ件数になります
  */
-const MAX_ROWS = 20;
+const MAX_ROWS = 100;
 
 /**
  * true: CSV出力する / false: CSV出力しない
@@ -387,11 +387,13 @@ function writeCsv(rows){
       no:String(rows.length+1),
       linkKey:b.signerPublicKey,
       addr:rawToAddr(raw),
-      balance:formatComma(roundXYM(bal,div)),
+      // balance:formatComma(roundXYM(bal,div)),
+      balance:`${formatComma(roundXYM(bal,div))}XYM`,
       imp:impPct(acc.importance,totalImp),
       height:String(b.height),
       time:jstString(Number(b.timestamp)+epoch*1000), // Symbol timestamp(ms) = timestamp + epochAdjustment
-      reward:decXYM(rew,div),
+      // reward:decXYM(rew,div),
+      reward:`${decXYM(rew,div)}XYM`,
     });
   }
 
