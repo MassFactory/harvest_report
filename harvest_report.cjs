@@ -387,13 +387,19 @@ function writeCsv(rows){
       no:String(rows.length+1),
       linkKey:b.signerPublicKey,
       addr:rawToAddr(raw),
+
+      // 残高の数値の後に XYM が付きます。付けない場合は、下のコメント部分を使ってね。
       // balance:formatComma(roundXYM(bal,div)),
       balance:`${formatComma(roundXYM(bal,div))}XYM`,
+
       imp:impPct(acc.importance,totalImp),
       height:String(b.height),
       time:jstString(Number(b.timestamp)+epoch*1000), // Symbol timestamp(ms) = timestamp + epochAdjustment
+
+      // 数量の数値の後に XYM が付きます。付けない場合は、下のコメント部分を使ってね。
       // reward:decXYM(rew,div),
       reward:`${decXYM(rew,div)}XYM`,
+
     });
   }
 
