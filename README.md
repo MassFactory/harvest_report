@@ -115,6 +115,8 @@ Symbol REST API を直接参照して収集・集計し、
 - **日時（JST）**: 	  ブロックが生成された日時を日本時間（JST）で表示したものです。
 - **数量**: 		  対象ブロックにおいて受領したハーベスト報酬量です。
 
+---
+
 ## Disclaimer / 免責事項
 
 - This software is provided "as is" and without warranty of any kind.
