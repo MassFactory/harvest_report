@@ -26,7 +26,7 @@ const MAX_ROWS = 20;
  * true: CSV出力する / false: CSV出力しない
  * ※ターミナル表示は常に行う
  */
-const CSV_ENABLED = true;
+const CSV_ENABLED = false;
 
 /**
  * CSVの出力先ディレクトリ（なければ自動作成）
@@ -195,7 +195,9 @@ function b32(buf){
 
 /** rawアドレス(16進) -> Base32アドレス文字列 */
 function rawToAddr(hex){
-  return b32(Buffer.from(norm(hex),'hex'));
+  const cleaned = norm(hex);
+  if (!/^[0-9A-F]{48}$/.test(cleaned)) return 'INVALID_ADDRESS';
+  return b32(Buffer.from(cleaned,'hex'));
 }
 
 /* ================= Importance % ================= */
