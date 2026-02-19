@@ -288,8 +288,10 @@ function printTable(base, rows){
  */
 function csvEscape(v){
   const s=String(v ?? '');
-  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  const hardened=/^[=+\-@\t\r\n]/.test(s) ? `'${s}` : s;
+  return /[",\r\n]/.test(hardened) ? `"${hardened.replace(/"/g,'""')}"` : hardened;
 }
+
 
 /**
  * 集計結果をCSVとして保存する
