@@ -1,9 +1,16 @@
 # harvest_report
-The tool collects and aggregates harvested block information of accounts delegated to your own node by directly querying the Symbol REST API, and displays the results in a clear, tabular format in the terminal.
-Optionally, the aggregated data can also be exported as a UTF-8 BOM–encoded CSV file.
+Collects and aggregates block information harvested by accounts delegated to an operator node built with symbol-bootstrap and symbol shoestring.
 
-This tool is implemented using Node.js standard features only and does not depend on external libraries or the Symbol SDK.
-As a result, it can be placed directly in a node operation environment and is easy to maintain for long-term use.
+It directly queries the Symbol REST API to retrieve and aggregate data,
+and displays the results clearly in a tabular format on the terminal.
+
+If needed, the results can also be exported as a UTF-8 BOM–encoded CSV file.
+
+This tool is implemented using only standard Node.js features
+and does not depend on any external libraries or the Symbol SDK.
+
+Therefore, it can be deployed directly into a node operation environment,
+making it suitable for long-term operation and easy maintenance.
 
 ---
 
@@ -11,7 +18,10 @@ As a result, it can be placed directly in a node operation environment and is ea
 
 ## 概要 (Overview)
 
+symbol-bootstrap 及び symbol shoestringで構築された、
 運営ノードに委任されているアカウントがハーベストしたブロック情報を、
+集計します。
+
 Symbol REST API を直接参照して収集・集計し、
 ターミナル上に 表形式でわかりやすく表示します。
 また、必要に応じて UTF-8 BOM 付き CSV として出力することも可能です。
