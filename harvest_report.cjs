@@ -26,7 +26,7 @@ const MAX_ROWS = 20;
  * true: CSV出力する / false: CSV出力しない
  * ※ターミナル表示は常に行う
  */
-const CSV_ENABLED = false;
+const CSV_ENABLED = true;
 
 /**
  * CSVの出力先ディレクトリ（なければ自動作成）
@@ -46,9 +46,14 @@ const DEFAULT_HTTPS = 'https://localhost:3001';
  * - base: 'http://localhost:3000' など
  * - p: '/node/health' など（先頭スラッシュ付き）
  */
+/**
+ * REST リクエストのタイムアウト(ms)
+ */
+const REQUEST_TIMEOUT_MS = 10000;
+
 async function fetchJson(base, p) {
-  const r = await fetch(base + p);
-  if (!r.ok) throw new Error(`HTTP ${r.status} ${p}`);
+  const r = await fetch(base + p, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+  if (!r.ok) throw new Error(`HTTP ${r.status} ${p}`);  
   return r.json();
 }
 
