@@ -20,7 +20,7 @@ const path = require('path');
  * ターミナルに表示する最大行数（最新から MAX_ROWS 件）
  * ※CSVも同じ件数になります
  */
-const MAX_ROWS = 100;
+const MAX_ROWS = 20;
 
 /**
  * true: CSV出力する / false: CSV出力しない
@@ -46,9 +46,14 @@ const DEFAULT_HTTPS = 'https://localhost:3001';
  * - base: 'http://localhost:3000' など
  * - p: '/node/health' など（先頭スラッシュ付き）
  */
+/**
+ * REST リクエストのタイムアウト(ms)
+ */
+const REQUEST_TIMEOUT_MS = 10000;
+
 async function fetchJson(base, p) {
-  const r = await fetch(base + p);
-  if (!r.ok) throw new Error(`HTTP ${r.status} ${p}`);
+  const r = await fetch(base + p, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+  if (!r.ok) throw new Error(`HTTP ${r.status} ${p}`);  
   return r.json();
 }
 
@@ -190,7 +195,9 @@ function b32(buf){
 
 /** rawアドレス(16進) -> Base32アドレス文字列 */
 function rawToAddr(hex){
-  return b32(Buffer.from(norm(hex),'hex'));
+  const cleaned = norm(hex);
+  if (!/^[0-9A-F]{48}$/.test(cleaned)) return 'INVALID_ADDRESS';
+  return b32(Buffer.from(cleaned,'hex'));
 }
 
 /* ================= Importance % ================= */
@@ -283,8 +290,10 @@ function printTable(base, rows){
  */
 function csvEscape(v){
   const s=String(v ?? '');
-  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  const hardened=/^[=+\-@\t\r\n]/.test(s) ? `'${s}` : s;
+  return /[",\r\n]/.test(hardened) ? `"${hardened.replace(/"/g,'""')}"` : hardened;
 }
+
 
 /**
  * 集計結果をCSVとして保存する
@@ -387,13 +396,19 @@ function writeCsv(rows){
       no:String(rows.length+1),
       linkKey:b.signerPublicKey,
       addr:rawToAddr(raw),
+
+      // 残高の数値の後に XYM が付きます。付けない場合は、下のコメント部分を使ってね。
       // balance:formatComma(roundXYM(bal,div)),
       balance:`${formatComma(roundXYM(bal,div))}XYM`,
+
       imp:impPct(acc.importance,totalImp),
       height:String(b.height),
       time:jstString(Number(b.timestamp)+epoch*1000), // Symbol timestamp(ms) = timestamp + epochAdjustment
+
+      // 数量の数値の後に XYM が付きます。付けない場合は、下のコメント部分を使ってね。
       // reward:decXYM(rew,div),
       reward:`${decXYM(rew,div)}XYM`,
+
     });
   }
 
