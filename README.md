@@ -105,3 +105,13 @@ Symbol REST API を直接参照して収集・集計し、
 - **日時（JST）**: 	  ブロックが生成された日時を日本時間（JST）で表示したものです。
 - **数量**: 		  対象ブロックにおいて受領したハーベスト報酬量です。
 
+## Disclaimer / 免責事項
+
+- This software is provided "as is" and without warranty of any kind.
+- The author does not guarantee the accuracy or completeness of the results obtained.
+- The author assumes no responsibility for any damages or disadvantages arising from the use of this software. Use at your own risk.
+
+- 本ソフトウェアは「現状有姿」で提供され、いかなる保証もありません。
+- 作者は、得られた結果の正確性や完全性を保証しません。
+- 本ソフトウェアの使用によって生じた損害や不利益について、作者は一切の責任を負いません。利用者の責任において使用してください。
+
